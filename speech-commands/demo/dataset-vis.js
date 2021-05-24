@@ -133,7 +133,7 @@ export class DatasetViz {
 
     // Determine the position of the example in the word of the dataset.
     const exampleUIDs =
-        this.transferRecognizer.getExamples(word).map(ex => ex.uid);
+        this.transferRecognizer.getExamples(word).map((ex) => ex.uid);
     const position = exampleUIDs.indexOf(uid);
     this.navIndices[word] = exampleUIDs.indexOf(uid);
 
@@ -164,7 +164,7 @@ export class DatasetViz {
     // Set up the click callback for the spectrogram canvas. When clicked,
     // the keyFrameIndex will be set.
     if (word !== speechCommands.BACKGROUND_NOISE_TAG) {
-      exampleCanvas.addEventListener('click', event => {
+      exampleCanvas.addEventListener('click', (event) => {
         const relativeX =
             getCanvasClickRelativeXCoordinate(exampleCanvas, event);
         const numFrames = spectrogram.data.length / spectrogram.frameSize;
@@ -187,7 +187,7 @@ export class DatasetViz {
           maxPixelWidth: Math.round(0.4 * window.innerWidth),
           markKeyFrame: this.transferDurationMultiplier > 1 &&
               word !== speechCommands.BACKGROUND_NOISE_TAG,
-          keyFrameIndex: spectrogram.keyFrameIndex
+          keyFrameIndex: spectrogram.keyFrameIndex,
         });
 
     if (rawAudio != null) {
@@ -287,7 +287,7 @@ export class DatasetViz {
         this.transferRecognizer.countExamples();
     const minCountByClass =
         this.words_()
-            .map(word => exampleCounts[word] || 0)
+            .map((word) => exampleCounts[word] || 0)
             .reduce((prev, current) => current < prev ? current : prev);
     for (const element of this.container.children) {
       const word = element.getAttribute('word');

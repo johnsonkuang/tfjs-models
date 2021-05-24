@@ -1,3 +1,6 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable camelcase */
+/* eslint-disable max-len */
 /**
  * @license
  * Copyright 2019 Google LLC. All Rights Reserved.
@@ -20,8 +23,8 @@ import Plotly from 'plotly.js-dist';
 
 import * as SpeechCommands from '@tensorflow-models/speech-commands';
 
-import {DatasetViz, removeNonFixedChildrenFromWordDiv} from './dataset-vis';
-import {hideCandidateWords, logToStatusDisplay, plotPredictions, plotSpectrogram, populateCandidateWords, showCandidateWords} from './ui';
+import { DatasetViz, removeNonFixedChildrenFromWordDiv } from './dataset-vis';
+import { hideCandidateWords, logToStatusDisplay, plotPredictions, plotSpectrogram, populateCandidateWords, showCandidateWords } from './ui';
 
 const startButton = document.getElementById('start');
 const stopButton = document.getElementById('stop');
@@ -38,18 +41,18 @@ const datasetFileInput = document.getElementById('dataset-file-input');
 const uploadFilesButton = document.getElementById('upload-dataset');
 
 const evalModelOnDatasetButton =
-    document.getElementById('eval-model-on-dataset');
+  document.getElementById('eval-model-on-dataset');
 const evalResultsSpan = document.getElementById('eval-results');
 
 const modelIOButton = document.getElementById('model-io');
 const transferModelSaveLoadInnerDiv =
-    document.getElementById('transfer-model-save-load-inner');
+  document.getElementById('transfer-model-save-load-inner');
 const loadTransferModelButton = document.getElementById('load-transfer-model');
 const saveTransferModelButton = document.getElementById('save-transfer-model');
 const savedTransferModelsSelect =
-    document.getElementById('saved-transfer-models');
+  document.getElementById('saved-transfer-models');
 const deleteTransferModelButton =
-    document.getElementById('delete-transfer-model');
+  document.getElementById('delete-transfer-model');
 
 const BACKGROUND_NOISE_TAG = SpeechCommands.BACKGROUND_NOISE_TAG;
 
@@ -62,24 +65,24 @@ const durationMultiplierSelect = document.getElementById('duration-multiplier');
 const enterLearnWordsButton = document.getElementById('enter-learn-words');
 const createModelButton = document.getElementById('create-model');
 const includeTimeDomainWaveformCheckbox =
-    document.getElementById('include-audio-waveform');
+  document.getElementById('include-audio-waveform');
 const collectButtonsDiv = document.getElementById('collect-words');
 const startTransferLearnButton =
-    document.getElementById('start-transfer-learn');
+  document.getElementById('start-transfer-learn');
 
 const XFER_MODEL_NAME = 'xfer-model';
 
 let transferLearningWords = new Set();
 
 // Minimum required number of examples per class for transfer learning.
-const MIN_EXAMPLES_PER_CLASS = 8;
+const MIN_EXAMPLES_PER_CLASS = 2;
 
 let recognizer;
 let transferWords;
 let transferRecognizer;
 let transferDurationMultiplier;
 
-(async function() {
+(async function () {
   logToStatusDisplay('Creating recognizer...');
   recognizer = SpeechCommands.create('BROWSER_FFT');
 
@@ -89,77 +92,77 @@ let transferDurationMultiplier;
   // called here, the tf.Model will be loaded the first time
   // `listen()` is called.
   recognizer.ensureModelLoaded()
-      .then(() => {
-        startButton.disabled = false;
-        enterLearnWordsButton.disabled = false;
-        createModelButton.disabled = false;
-        loadTransferModelButton.disabled = false;
-        deleteTransferModelButton.disabled = false;
+    .then(() => {
+      startButton.disabled = false;
+      enterLearnWordsButton.disabled = false;
+      createModelButton.disabled = false;
+      loadTransferModelButton.disabled = false;
+      deleteTransferModelButton.disabled = false;
 
-        transferModelNameInput.value = `model-${getDateString()}`;
+      transferModelNameInput.value = `model-${getDateString()}`;
 
-        logToStatusDisplay('Model loaded.');
+      logToStatusDisplay('Model loaded.');
 
-        const params = recognizer.params();
-        logToStatusDisplay(`sampleRateHz: ${params.sampleRateHz}`);
-        logToStatusDisplay(`fftSize: ${params.fftSize}`);
-        logToStatusDisplay(
-            `spectrogramDurationMillis: ` +
-            `${params.spectrogramDurationMillis.toFixed(2)}`);
-        logToStatusDisplay(
-            `tf.Model input shape: ` +
-            `${JSON.stringify(recognizer.modelInputShape())}`);
-      })
-      .catch(err => {
-        logToStatusDisplay(
-            'Failed to load model for recognizer: ' + err.message);
-      });
+      const params = recognizer.params();
+      logToStatusDisplay(`sampleRateHz: ${params.sampleRateHz}`);
+      logToStatusDisplay(`fftSize: ${params.fftSize}`);
+      logToStatusDisplay(
+        `spectrogramDurationMillis: ` +
+        `${params.spectrogramDurationMillis.toFixed(2)}`);
+      logToStatusDisplay(
+        `tf.Model input shape: ` +
+        `${JSON.stringify(recognizer.modelInputShape())}`);
+    })
+    .catch((err) => {
+      logToStatusDisplay(
+        'Failed to load model for recognizer: ' + err.message);
+    });
 })();
 
 startButton.addEventListener('click', () => {
   const activeRecognizer =
-      transferRecognizer == null ? recognizer : transferRecognizer;
+    transferRecognizer == null ? recognizer : transferRecognizer;
   populateCandidateWords(activeRecognizer.wordLabels());
 
   const suppressionTimeMillis = 1000;
   activeRecognizer
-      .listen(
-          result => {
-            plotPredictions(
-                predictionCanvas, activeRecognizer.wordLabels(), result.scores,
-                3, suppressionTimeMillis);
-          },
-          {
-            includeSpectrogram: true,
-            suppressionTimeMillis,
-            probabilityThreshold: Number.parseFloat(probaThresholdInput.value)
-          })
-      .then(() => {
-        startButton.disabled = true;
-        stopButton.disabled = false;
-        showCandidateWords();
-        logToStatusDisplay('Streaming recognition started.');
+    .listen(
+      (result) => {
+        plotPredictions(
+          predictionCanvas, activeRecognizer.wordLabels(), result.scores,
+          3, suppressionTimeMillis);
+      },
+      {
+        includeSpectrogram: true,
+        suppressionTimeMillis,
+        probabilityThreshold: Number.parseFloat(probaThresholdInput.value),
       })
-      .catch(err => {
-        logToStatusDisplay(
-            'ERROR: Failed to start streaming display: ' + err.message);
-      });
+    .then(() => {
+      startButton.disabled = true;
+      stopButton.disabled = false;
+      showCandidateWords();
+      logToStatusDisplay('Streaming recognition started.');
+    })
+    .catch((err) => {
+      logToStatusDisplay(
+        'ERROR: Failed to start streaming display: ' + err.message);
+    });
 });
 
 stopButton.addEventListener('click', () => {
   const activeRecognizer =
-      transferRecognizer == null ? recognizer : transferRecognizer;
+    transferRecognizer == null ? recognizer : transferRecognizer;
   activeRecognizer.stopListening()
-      .then(() => {
-        startButton.disabled = false;
-        stopButton.disabled = true;
-        hideCandidateWords();
-        logToStatusDisplay('Streaming recognition stopped.');
-      })
-      .catch(err => {
-        logToStatusDisplay(
-            'ERROR: Failed to stop streaming display: ' + err.message);
-      });
+    .then(() => {
+      startButton.disabled = false;
+      stopButton.disabled = true;
+      hideCandidateWords();
+      logToStatusDisplay('Streaming recognition stopped.');
+    })
+    .catch((err) => {
+      logToStatusDisplay(
+        'ERROR: Failed to stop streaming display: ' + err.message);
+    });
 });
 
 /**
@@ -184,7 +187,7 @@ function createProgressBarAndIntervalJob(parentElement, durationSec) {
     progressBar.value += 0.05;
   }, durationSec * 1e3 / 20);
   parentElement.appendChild(progressBar);
-  return {progressBar, intervalJob};
+  return { progressBar, intervalJob };
 }
 
 /**
@@ -196,9 +199,9 @@ function createProgressBarAndIntervalJob(parentElement, durationSec) {
 function createWordDivs(transferWords) {
   // Don't clear, add if changed
   datasetViz = new DatasetViz(
-      transferRecognizer, collectButtonsDiv, MIN_EXAMPLES_PER_CLASS,
-      startTransferLearnButton, downloadAsFileButton,
-      transferDurationMultiplier);
+    transferRecognizer, collectButtonsDiv, MIN_EXAMPLES_PER_CLASS,
+    startTransferLearnButton, downloadAsFileButton,
+    transferDurationMultiplier);
   // TODO: add button to remove class and word
   const wordDivs = {};
   for (const word of transferWords) {
@@ -230,7 +233,7 @@ function createWordDivs(transferWords) {
     deleteButton.setAttribute('isFixed', 'true');
     deleteButton.style['display'] = 'inline-block';
     deleteButton.style['vertical-align'] = 'middle';
-    deleteButton.textContent = "delete";
+    deleteButton.textContent = 'delete';
     wordDiv.appendChild(deleteButton);
 
     let durationInput;
@@ -253,11 +256,11 @@ function createWordDivs(transferWords) {
       const examples = transferRecognizer.getExamples(word);
       examples.forEach((elt) => {
         transferRecognizer.removeExample(elt.uid);
-      })
+      });
       transferLearningWords.delete(word);
       delete collectWordButtons[word];
       wordDiv.remove();
-    })
+    });
 
     button.addEventListener('click', async () => {
       disableAllCollectWordButtons();
@@ -274,7 +277,7 @@ function createWordDivs(transferWords) {
         // _background_noise_ examples are special, in that user can specify
         // the length of the recording (in seconds).
         collectExampleOptions.durationSec =
-            Number.parseFloat(durationInput.value);
+          Number.parseFloat(durationInput.value);
         durationSec = collectExampleOptions.durationSec;
 
         const barAndJob = createProgressBarAndIntervalJob(wordDiv, durationSec);
@@ -297,18 +300,18 @@ function createWordDivs(transferWords) {
             tempSpectrogramData = spectrogram.data;
           } else {
             tempSpectrogramData = SpeechCommands.utils.concatenateFloat32Arrays(
-                [tempSpectrogramData, spectrogram.data]);
+              [tempSpectrogramData, spectrogram.data]);
           }
           plotSpectrogram(
-              tempCanvas, tempSpectrogramData, spectrogram.frameSize,
-              spectrogram.frameSize, {pixelsPerFrame: 2});
-        }
+            tempCanvas, tempSpectrogramData, spectrogram.frameSize,
+            spectrogram.frameSize, { pixelsPerFrame: 2 });
+        };
       }
 
       collectExampleOptions.includeRawAudio =
-          includeTimeDomainWaveformCheckbox.checked;
+        includeTimeDomainWaveformCheckbox.checked;
       const spectrogram =
-          await transferRecognizer.collectExample(word, collectExampleOptions);
+        await transferRecognizer.collectExample(word, collectExampleOptions);
 
       if (intervalJob != null) {
         clearInterval(intervalJob);
@@ -316,10 +319,10 @@ function createWordDivs(transferWords) {
       if (progressBar != null) {
         wordDiv.removeChild(progressBar);
       }
-      const examples = transferRecognizer.getExamples(word)
+      const examples = transferRecognizer.getExamples(word);
       const example = examples[examples.length - 1];
       await datasetViz.drawExample(
-          wordDiv, word, spectrogram, example.example.rawAudio, example.uid);
+        wordDiv, word, spectrogram, example.example.rawAudio, example.uid);
       enableAllCollectWordButtons();
     });
   }
@@ -346,9 +349,9 @@ createModelButton.addEventListener('click', async () => {
 
 enterLearnWordsButton.addEventListener('click', async () => {
   transferDurationMultiplier = durationMultiplierSelect.value;
-  //learnWordsInput.disabled = true;
-  //enterLearnWordsButton.disabled = true;
-  transferWords = learnWordsInput.value.trim().split(',').map(w => w.trim());
+  // learnWordsInput.disabled = true;
+  // enterLearnWordsButton.disabled = true;
+  transferWords = learnWordsInput.value.trim().split(',').map((w) => w.trim());
   transferWords.sort();
   if (transferWords == null || transferWords.length <= 1) {
     logToStatusDisplay('ERROR: Invalid list of transfer words.');
@@ -360,12 +363,14 @@ enterLearnWordsButton.addEventListener('click', async () => {
 });
 
 function disableAllCollectWordButtons() {
+  // eslint-disable-next-line guard-for-in
   for (const word in collectWordButtons) {
     collectWordButtons[word].disabled = true;
   }
 }
 
 function enableAllCollectWordButtons() {
+  // eslint-disable-next-line guard-for-in
   for (const word in collectWordButtons) {
     collectWordButtons[word].disabled = false;
   }
@@ -376,7 +381,7 @@ function disableFileUploadControls() {
   uploadFilesButton.disabled = true;
 }
 
-startTransferLearnButton.addEventListener('click', async () => {
+let transferLearn = async () => {
   startTransferLearnButton.disabled = true;
   startButton.disabled = true;
   startTransferLearnButton.textContent = 'Transfer learning starting...';
@@ -400,28 +405,28 @@ startTransferLearnButton.addEventListener('click', async () => {
       y: [],
       name: 'train' + phaseSuffix,
       mode: 'lines',
-      line: {width: lineWidth}
+      line: { width: lineWidth },
     };
     valLossValues[phase] = {
       x: [],
       y: [],
       name: 'val' + phaseSuffix,
       mode: 'lines',
-      line: {width: lineWidth}
+      line: { width: lineWidth },
     };
     trainAccValues[phase] = {
       x: [],
       y: [],
       name: 'train' + phaseSuffix,
       mode: 'lines',
-      line: {width: lineWidth}
+      line: { width: lineWidth },
     };
     valAccValues[phase] = {
       x: [],
       y: [],
       name: 'val' + phaseSuffix,
       mode: 'lines',
-      line: {width: lineWidth}
+      line: { width: lineWidth },
     };
   }
 
@@ -437,42 +442,41 @@ startTransferLearnButton.addEventListener('click', async () => {
     valAccValues[phase].y.push(val_acc);
 
     Plotly.newPlot(
-        'loss-plot',
-        [
-          trainLossValues[INITIAL_PHASE], valLossValues[INITIAL_PHASE],
-          trainLossValues[FINE_TUNING_PHASE], valLossValues[FINE_TUNING_PHASE]
-        ],
-        {
-          width: 480,
-          height: 360,
-          xaxis: {title: 'Epoch #'},
-          yaxis: {title: 'Loss'},
-          font: {size: 18}
-        });
+      'loss-plot',
+      [
+        trainLossValues[INITIAL_PHASE], valLossValues[INITIAL_PHASE],
+        trainLossValues[FINE_TUNING_PHASE], valLossValues[FINE_TUNING_PHASE],
+      ],
+      {
+        width: 480,
+        height: 360,
+        xaxis: { title: 'Epoch #' },
+        yaxis: { title: 'Loss' },
+        font: { size: 18 },
+      });
     Plotly.newPlot(
-        'accuracy-plot',
-        [
-          trainAccValues[INITIAL_PHASE], valAccValues[INITIAL_PHASE],
-          trainAccValues[FINE_TUNING_PHASE], valAccValues[FINE_TUNING_PHASE]
-        ],
-        {
-          width: 480,
-          height: 360,
-          xaxis: {title: 'Epoch #'},
-          yaxis: {title: 'Accuracy'},
-          font: {size: 18}
-        });
+      'accuracy-plot',
+      [
+        trainAccValues[INITIAL_PHASE], valAccValues[INITIAL_PHASE],
+        trainAccValues[FINE_TUNING_PHASE], valAccValues[FINE_TUNING_PHASE],
+      ],
+      {
+        width: 480,
+        height: 360,
+        xaxis: { title: 'Epoch #' },
+        yaxis: { title: 'Accuracy' },
+        font: { size: 18 },
+      });
     startTransferLearnButton.textContent = phase === INITIAL_PHASE ?
-        `Transfer-learning... (${(epoch / epochs * 1e2).toFixed(0)}%)` :
-        `Transfer-learning (fine-tuning)... (${
-            (epoch / fineTuningEpochs * 1e2).toFixed(0)}%)`
+      `Transfer-learning... (${(epoch / epochs * 1e2).toFixed(0)}%)` :
+      `Transfer-learning (fine-tuning)... (${(epoch / fineTuningEpochs * 1e2).toFixed(0)}%)`;
 
     scrollToPageBottom();
   }
 
   disableAllCollectWordButtons();
   const augmentByMixingNoiseRatio =
-      document.getElementById('augment-by-mixing-noise').checked ? 0.5 : null;
+    document.getElementById('augment-by-mixing-noise').checked ? 0.5 : null;
   console.log(`augmentByMixingNoiseRatio = ${augmentByMixingNoiseRatio}`);
   await transferRecognizer.train({
     epochs,
@@ -481,18 +485,18 @@ startTransferLearnButton.addEventListener('click', async () => {
     callback: {
       onEpochEnd: async (epoch, logs) => {
         plotLossAndAccuracy(
-            epoch, logs.loss, logs.acc, logs.val_loss, logs.val_acc,
-            INITIAL_PHASE);
-      }
+          epoch, logs.loss, logs.acc, logs.val_loss, logs.val_acc,
+          INITIAL_PHASE);
+      },
     },
     fineTuningEpochs,
     fineTuningCallback: {
       onEpochEnd: async (epoch, logs) => {
         plotLossAndAccuracy(
-            epoch, logs.loss, logs.acc, logs.val_loss, logs.val_acc,
-            FINE_TUNING_PHASE);
-      }
-    }
+          epoch, logs.loss, logs.acc, logs.val_loss, logs.val_acc,
+          FINE_TUNING_PHASE);
+      },
+    },
   });
   saveTransferModelButton.disabled = false;
   transferModelNameInput.value = transferRecognizer.name;
@@ -501,7 +505,9 @@ startTransferLearnButton.addEventListener('click', async () => {
   transferModelNameInput.disabled = false;
   startButton.disabled = false;
   evalModelOnDatasetButton.disabled = false;
-});
+};
+
+startTransferLearnButton.addEventListener('click', transferLearn);
 
 downloadAsFileButton.addEventListener('click', () => {
   const basename = getDateString();
@@ -511,7 +517,7 @@ downloadAsFileButton.addEventListener('click', () => {
   const anchor = document.createElement('a');
   anchor.download = `${basename}.bin`;
   anchor.href = window.URL.createObjectURL(
-      new Blob([artifacts], {type: 'application/octet-stream'}));
+    new Blob([artifacts], { type: 'application/octet-stream' }));
   anchor.click();
 });
 
@@ -548,7 +554,7 @@ uploadFilesButton.addEventListener('click', async () => {
     throw new Error('Must select exactly one file.');
   }
   const datasetFileReader = new FileReader();
-  datasetFileReader.onload = async event => {
+  datasetFileReader.onload = async (event) => {
     try {
       await loadDatasetInTransferRecognizer(event.target.result);
     } catch (err) {
@@ -563,7 +569,7 @@ uploadFilesButton.addEventListener('click', async () => {
     enterLearnWordsButton.disabled = true;
   };
   datasetFileReader.onerror = () =>
-      console.error(`Failed to binary data from file '${dataFile.name}'.`);
+    console.error(`Failed to binary data from file '${dataFile.name}'.`);
   datasetFileReader.readAsArrayBuffer(files[0]);
 });
 
@@ -581,6 +587,7 @@ async function loadDatasetInTransferRecognizer(serialized) {
   transferWords = [];
   const modelNumFrames = transferRecognizer.modelInputShape()[1];
   const durationMultipliers = [];
+  // eslint-disable-next-line guard-for-in
   for (const word in exampleCounts) {
     transferWords.push(word);
     const examples = transferRecognizer.getExamples(word);
@@ -590,7 +597,7 @@ async function loadDatasetInTransferRecognizer(serialized) {
       // multiplier of the dataset.
       if (word !== BACKGROUND_NOISE_TAG) {
         durationMultipliers.push(Math.round(
-            spectrogram.data.length / spectrogram.frameSize / modelNumFrames));
+          spectrogram.data.length / spectrogram.frameSize / modelNumFrames));
       }
     }
   }
@@ -599,10 +606,10 @@ async function loadDatasetInTransferRecognizer(serialized) {
 
   // Determine the transferDurationMultiplier value from the dataset.
   transferDurationMultiplier =
-      durationMultipliers.length > 0 ? Math.max(...durationMultipliers) : 1;
+    durationMultipliers.length > 0 ? Math.max(...durationMultipliers) : 1;
   console.log(
-      `Deteremined transferDurationMultiplier from uploaded ` +
-      `dataset: ${transferDurationMultiplier}`);
+    `Deteremined transferDurationMultiplier from uploaded ` +
+    `dataset: ${transferDurationMultiplier}`);
 
   createWordDivs(transferWords);
   datasetViz.redrawAll();
@@ -615,7 +622,7 @@ evalModelOnDatasetButton.addEventListener('click', async () => {
   }
   evalModelOnDatasetButton.disabled = true;
   const datasetFileReader = new FileReader();
-  datasetFileReader.onload = async event => {
+  datasetFileReader.onload = async (event) => {
     try {
       if (transferRecognizer == null) {
         throw new Error('There is no model!');
@@ -627,13 +634,13 @@ evalModelOnDatasetButton.addEventListener('click', async () => {
       const evalResult = await transferRecognizer.evaluate({
         windowHopRatio: 0.25,
         wordProbThresholds: [
-          0,    0.05, 0.1,  0.15, 0.2,  0.25, 0.3,  0.35, 0.4,  0.5,
-          0.55, 0.6,  0.65, 0.7,  0.75, 0.8,  0.85, 0.9,  0.95, 1.0
-        ]
+          0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.5,
+          0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0,
+        ],
       });
       // Plot the ROC curve.
-      const rocDataForPlot = {x: [], y: []};
-      evalResult.rocCurve.forEach(item => {
+      const rocDataForPlot = { x: [], y: [] };
+      evalResult.rocCurve.forEach((item) => {
         rocDataForPlot.x.push(item.fpr);
         rocDataForPlot.y.push(item.tpr);
       });
@@ -642,10 +649,10 @@ evalModelOnDatasetButton.addEventListener('click', async () => {
         width: 360,
         height: 360,
         mode: 'markers',
-        marker: {size: 7},
-        xaxis: {title: 'False positive rate (FPR)', range: [0, 1]},
-        yaxis: {title: 'True positive rate (TPR)', range: [0, 1]},
-        font: {size: 18}
+        marker: { size: 7 },
+        xaxis: { title: 'False positive rate (FPR)', range: [0, 1] },
+        yaxis: { title: 'True positive rate (TPR)', range: [0, 1] },
+        font: { size: 18 },
       });
       evalResultsSpan.textContent = `AUC = ${evalResult.auc}`;
     } catch (err) {
@@ -658,7 +665,7 @@ evalModelOnDatasetButton.addEventListener('click', async () => {
     evalModelOnDatasetButton.disabled = false;
   };
   datasetFileReader.onerror = () =>
-      console.error(`Failed to binary data from file '${dataFile.name}'.`);
+    console.error(`Failed to binary data from file '${dataFile.name}'.`);
   datasetFileReader.readAsArrayBuffer(files[0]);
 });
 
@@ -725,10 +732,10 @@ datasetIOButton.addEventListener('click', () => {
   if (datasetIOButton.textContent.endsWith(' >>')) {
     datasetIOInnerDiv.style.display = 'inline-block';
     datasetIOButton.textContent =
-        datasetIOButton.textContent.replace(' >>', ' <<');
+      datasetIOButton.textContent.replace(' >>', ' <<');
   } else {
     datasetIOInnerDiv.style.display = 'none';
     datasetIOButton.textContent =
-        datasetIOButton.textContent.replace(' <<', ' >>');
+      datasetIOButton.textContent.replace(' <<', ' >>');
   }
 });
