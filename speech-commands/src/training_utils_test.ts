@@ -15,6 +15,8 @@
  * =============================================================================
  */
 
+/* eslint-disable */
+
 import '@tensorflow/tfjs-node';
 
 import * as tf from '@tensorflow/tfjs-core';

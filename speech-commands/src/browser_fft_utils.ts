@@ -15,6 +15,8 @@
  * =============================================================================
  */
 
+/* eslint-disable */
+
 import * as tf from '@tensorflow/tfjs-core';
 import {promisify} from 'util';
 

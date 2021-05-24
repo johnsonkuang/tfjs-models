@@ -16,6 +16,8 @@
  * =============================================================================
  */
 
+/* eslint-disable */
+
 import {expectArraysEqual} from '@tensorflow/tfjs-core/dist/test_util';
 
 import {arrayBuffer2String, concatenateFloat32Arrays, string2ArrayBuffer} from './generic_utils';

@@ -15,6 +15,8 @@
  * =============================================================================
  */
 
+/* eslint-disable */
+
 /**
  * Utility functions for training and transfer learning of the speech-commands
  * model.

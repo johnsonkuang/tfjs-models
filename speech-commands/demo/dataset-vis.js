@@ -289,7 +289,6 @@ export class DatasetViz {
         this.words_()
             .map(word => exampleCounts[word] || 0)
             .reduce((prev, current) => current < prev ? current : prev);
-
     for (const element of this.container.children) {
       const word = element.getAttribute('word');
       const button = element.children[0];

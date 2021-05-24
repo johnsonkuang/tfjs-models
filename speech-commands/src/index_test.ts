@@ -15,6 +15,8 @@
  * =============================================================================
  */
 
+/* eslint-disable */
+
 // tslint:disable-next-line:no-require-imports
 const packageJSON = require('../package.json');
 import * as tf from '@tensorflow/tfjs-core';

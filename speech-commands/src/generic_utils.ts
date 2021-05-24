@@ -15,6 +15,8 @@
  * =============================================================================
  */
 
+/* eslint-disable */
+
 /**
  * Concatenate a number of ArrayBuffers into one.
  *

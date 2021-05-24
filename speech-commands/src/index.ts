@@ -15,12 +15,14 @@
  * =============================================================================
  */
 
+/* eslint-disable */
+
 import * as tf from '@tensorflow/tfjs-core';
 
-import {BrowserFftSpeechCommandRecognizer} from './browser_fft_recognizer';
-import {playRawAudio} from './browser_fft_utils';
-import {concatenateFloat32Arrays} from './generic_utils';
-import {FFT_TYPE, SpeechCommandRecognizer, SpeechCommandRecognizerMetadata} from './types';
+import { BrowserFftSpeechCommandRecognizer } from './browser_fft_recognizer';
+import { playRawAudio } from './browser_fft_utils';
+import { concatenateFloat32Arrays } from './generic_utils';
+import { FFT_TYPE, SpeechCommandRecognizer, SpeechCommandRecognizerMetadata } from './types';
 import { normalizeFloat32Array, normalize } from './browser_fft_utils';
 
 /**
@@ -50,28 +52,29 @@ import { normalizeFloat32Array, normalize } from './browser_fft_utils';
  * @throws Error on invalid value of `fftType`.
  */
 export function create(
-    fftType: FFT_TYPE, vocabulary?: string,
-    customModelArtifactsOrURL?: tf.io.ModelArtifacts|string,
-    customMetadataOrURL?: SpeechCommandRecognizerMetadata|
+  fftType: FFT_TYPE, vocabulary?: string,
+  customModelArtifactsOrURL?: tf.io.ModelArtifacts | string,
+  customMetadataOrURL?: SpeechCommandRecognizerMetadata |
     string): SpeechCommandRecognizer {
+  console.log("test");
   tf.util.assert(
-      customModelArtifactsOrURL == null && customMetadataOrURL == null ||
-          customModelArtifactsOrURL != null && customMetadataOrURL != null,
-      () => `customModelURL and customMetadataURL must be both provided or ` +
-          `both not provided.`);
+    customModelArtifactsOrURL == null && customMetadataOrURL == null ||
+    customModelArtifactsOrURL != null && customMetadataOrURL != null,
+    () => `customModelURL and customMetadataURL must be both provided or ` +
+      `both not provided.`);
   if (customModelArtifactsOrURL != null) {
     tf.util.assert(
-        vocabulary == null,
-        () => `vocabulary name must be null or undefined when modelURL ` +
-            `is provided.`);
+      vocabulary == null,
+      () => `vocabulary name must be null or undefined when modelURL ` +
+        `is provided.`);
   }
 
   if (fftType === 'BROWSER_FFT') {
     return new BrowserFftSpeechCommandRecognizer(
-        vocabulary, customModelArtifactsOrURL, customMetadataOrURL);
+      vocabulary, customModelArtifactsOrURL, customMetadataOrURL);
   } else if (fftType === 'SOFT_FFT') {
     throw new Error(
-        'SOFT_FFT SpeechCommandRecognizer has not been implemented yet.');
+      'SOFT_FFT SpeechCommandRecognizer has not been implemented yet.');
   } else {
     throw new Error(`Invalid fftType: '${fftType}'`);
   }
@@ -84,8 +87,8 @@ const utils = {
   playRawAudio
 };
 
-export {BACKGROUND_NOISE_TAG, Dataset, GetDataConfig as GetSpectrogramsAsTensorsConfig, getMaxIntensityFrameIndex, spectrogram2IntensityCurve, SpectrogramAndTargetsTfDataset} from './dataset';
-export {AudioDataAugmentationOptions, Example, FFT_TYPE, RawAudioData, RecognizerParams, SpectrogramData, SpeechCommandRecognizer, SpeechCommandRecognizerMetadata, SpeechCommandRecognizerResult, StreamingRecognitionConfig, TransferLearnConfig, TransferSpeechCommandRecognizer} from './types';
-export {deleteSavedTransferModel, listSavedTransferModels, UNKNOWN_TAG} from './browser_fft_recognizer';
-export {utils};
-export {version} from './version';
+export { BACKGROUND_NOISE_TAG, Dataset, GetDataConfig as GetSpectrogramsAsTensorsConfig, getMaxIntensityFrameIndex, spectrogram2IntensityCurve, SpectrogramAndTargetsTfDataset } from './dataset';
+export { AudioDataAugmentationOptions, Example, FFT_TYPE, RawAudioData, RecognizerParams, SpectrogramData, SpeechCommandRecognizer, SpeechCommandRecognizerMetadata, SpeechCommandRecognizerResult, StreamingRecognitionConfig, TransferLearnConfig, TransferSpeechCommandRecognizer } from './types';
+export { deleteSavedTransferModel, listSavedTransferModels, UNKNOWN_TAG } from './browser_fft_recognizer';
+export { utils };
+export { version } from './version';

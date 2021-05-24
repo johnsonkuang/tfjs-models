@@ -15,6 +15,8 @@
  * =============================================================================
  */
 
+/* eslint-disable */
+
 import * as tf from '@tensorflow/tfjs-core';
 import * as tfd from '@tensorflow/tfjs-data';
 import {normalize} from './browser_fft_utils';

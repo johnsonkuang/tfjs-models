@@ -19,6 +19,8 @@
  * Audio FFT Feature Extractor based on Browser-Native FFT.
  */
 
+/* eslint-disable */
+
 import * as tf from '@tensorflow/tfjs-core';
 
 import {getAudioContextConstructor, getAudioMediaStream} from './browser_fft_utils';

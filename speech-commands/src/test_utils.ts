@@ -15,6 +15,8 @@
  * =============================================================================
  */
 
+/* eslint-disable */
+
 import {Tensor, test_util, util} from '@tensorflow/tfjs-core';
 
 export function expectTensorsClose(

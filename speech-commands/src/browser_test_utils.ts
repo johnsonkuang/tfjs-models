@@ -15,6 +15,8 @@
  * =============================================================================
  */
 
+/* eslint-disable */
+
 /**
  * Testing Utilities for Browser Audio Feature Extraction.
  */

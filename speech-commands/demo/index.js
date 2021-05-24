@@ -60,6 +60,7 @@ const transferModelNameInput = document.getElementById('transfer-model-name');
 const learnWordsInput = document.getElementById('learn-words');
 const durationMultiplierSelect = document.getElementById('duration-multiplier');
 const enterLearnWordsButton = document.getElementById('enter-learn-words');
+const createModelButton = document.getElementById('create-model');
 const includeTimeDomainWaveformCheckbox =
     document.getElementById('include-audio-waveform');
 const collectButtonsDiv = document.getElementById('collect-words');
@@ -67,6 +68,8 @@ const startTransferLearnButton =
     document.getElementById('start-transfer-learn');
 
 const XFER_MODEL_NAME = 'xfer-model';
+
+let transferLearningWords = new Set();
 
 // Minimum required number of examples per class for transfer learning.
 const MIN_EXAMPLES_PER_CLASS = 8;
@@ -89,6 +92,7 @@ let transferDurationMultiplier;
       .then(() => {
         startButton.disabled = false;
         enterLearnWordsButton.disabled = false;
+        createModelButton.disabled = false;
         loadTransferModelButton.disabled = false;
         deleteTransferModelButton.disabled = false;
 
@@ -190,21 +194,24 @@ function createProgressBarAndIntervalJob(parentElement, durationSec) {
  * @returns {Object} An object mapping word to th div element created for it.
  */
 function createWordDivs(transferWords) {
-  // Clear collectButtonsDiv first.
-  while (collectButtonsDiv.firstChild) {
-    collectButtonsDiv.removeChild(collectButtonsDiv.firstChild);
-  }
+  // Don't clear, add if changed
   datasetViz = new DatasetViz(
       transferRecognizer, collectButtonsDiv, MIN_EXAMPLES_PER_CLASS,
       startTransferLearnButton, downloadAsFileButton,
       transferDurationMultiplier);
-
+  // TODO: add button to remove class and word
   const wordDivs = {};
   for (const word of transferWords) {
+    if (transferLearningWords.has(word)) {
+      continue;
+    }
+    transferLearningWords.add(word);
     const wordDiv = document.createElement('div');
     wordDiv.classList.add('word-div');
     wordDivs[word] = wordDiv;
     wordDiv.setAttribute('word', word);
+
+    // create record button
     const button = document.createElement('button');
     button.setAttribute('isFixed', 'true');
     button.style['display'] = 'inline-block';
@@ -217,6 +224,14 @@ function createWordDivs(transferWords) {
     wordDiv.className = 'transfer-word';
     collectButtonsDiv.appendChild(wordDiv);
     collectWordButtons[word] = button;
+
+    // create delete button
+    const deleteButton = document.createElement('button');
+    deleteButton.setAttribute('isFixed', 'true');
+    deleteButton.style['display'] = 'inline-block';
+    deleteButton.style['vertical-align'] = 'middle';
+    deleteButton.textContent = "delete";
+    wordDiv.appendChild(deleteButton);
 
     let durationInput;
     if (word === BACKGROUND_NOISE_TAG) {
@@ -234,11 +249,19 @@ function createWordDivs(transferWords) {
       timeUnitSpan.textContent = 'seconds';
       wordDiv.appendChild(timeUnitSpan);
     }
+    deleteButton.addEventListener('click', () => {
+      const examples = transferRecognizer.getExamples(word);
+      examples.forEach((elt) => {
+        transferRecognizer.removeExample(elt.uid);
+      })
+      transferLearningWords.delete(word);
+      delete collectWordButtons[word];
+      wordDiv.remove();
+    })
 
     button.addEventListener('click', async () => {
       disableAllCollectWordButtons();
-      removeNonFixedChildrenFromWordDiv(wordDiv);
-
+      // removeNonFixedChildrenFromWordDiv(wordDiv);
       const collectExampleOptions = {};
       let durationSec;
       let intervalJob;
@@ -287,7 +310,6 @@ function createWordDivs(transferWords) {
       const spectrogram =
           await transferRecognizer.collectExample(word, collectExampleOptions);
 
-
       if (intervalJob != null) {
         clearInterval(intervalJob);
       }
@@ -304,37 +326,36 @@ function createWordDivs(transferWords) {
   return wordDivs;
 }
 
-enterLearnWordsButton.addEventListener('click', () => {
+createModelButton.addEventListener('click', async () => {
   const modelName = transferModelNameInput.value;
   if (modelName == null || modelName.length === 0) {
-    enterLearnWordsButton.textContent = 'Need model name!';
+    createModelButton.textContent = 'Need model name!';
     setTimeout(() => {
-      enterLearnWordsButton.textContent = 'Enter transfer words';
+      createModelButton.textContent = 'Enter transfer words';
     }, 2000);
     return;
   }
-
   // We disable the option to upload an existing dataset from files
   // once the "Enter transfer words" button has been clicked.
   // However, the user can still load an existing dataset from
   // files first and keep appending examples to it.
   disableFileUploadControls();
-  enterLearnWordsButton.disabled = true;
+  createModelButton.disabled = true;
+  transferRecognizer = recognizer.createTransfer(modelName);
+});
 
+enterLearnWordsButton.addEventListener('click', async () => {
   transferDurationMultiplier = durationMultiplierSelect.value;
-
-  learnWordsInput.disabled = true;
-  enterLearnWordsButton.disabled = true;
+  //learnWordsInput.disabled = true;
+  //enterLearnWordsButton.disabled = true;
   transferWords = learnWordsInput.value.trim().split(',').map(w => w.trim());
   transferWords.sort();
   if (transferWords == null || transferWords.length <= 1) {
     logToStatusDisplay('ERROR: Invalid list of transfer words.');
     return;
   }
-
-  transferRecognizer = recognizer.createTransfer(modelName);
   createWordDivs(transferWords);
-
+  datasetViz.redrawAll();
   scrollToPageBottom();
 });
 
